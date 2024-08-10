@@ -1,0 +1,33 @@
+{
+  "name": "ultimate-todo-list",
+  "version": "1.0.0",
+  "description": "This is a ultimate todo list where ou can maintain multiple todo lists",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bipsig/ultimate-todo-list.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "ejs",
+    "mongodb",
+    "mongoose",
+    "morgan",
+    "lodash"
+  ],
+  "author": "Sagnik",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.5.2",
+    "morgan": "^1.10.0"
+  }
+}
