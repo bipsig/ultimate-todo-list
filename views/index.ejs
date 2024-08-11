@@ -1,57 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="stylesheet" href="styles/styles.css" />
-        <title>TODO List</title>
-    </head>
+<head>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <title>TODO List</title>
+</head>
 <body>
     <div class="login-wrap">
         <div class="login-html">
-            <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign
-                In</label>
-            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+            <label for="tab-1" class="tab">Sign In</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up">
+            <label for="tab-2" class="tab">Sign Up</label>
             <div class="login-form">
+                <!-- Sign In Form -->
                 <div class="sign-in-htm">
-                    <div class="group">
-                        <label for="user" class="label">Username</label>
-                        <input id="user" type="text" class="input">
-                    </div>
-                    <div class="group">
-                        <label for="pass" class="label">Password</label>
-                        <input id="pass" type="password" class="input" data-type="password">
-                    </div>
-                    <div class="group">
-                        <input type="submit" class="button" value="Sign In">
-                    </div>
-                    <div class="hr"></div>
-                    <div class="foot-lnk">
-                        <a href="#forgot">Forgot Password?</a>
-                    </div>
+                    <form action="/signin" method="POST">
+                        <div class="group">
+                            <label for="signin-user" class="label">Username</label>
+                            <input id="signin-user" name="username" type="text" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="signin-pass" class="label">Password</label>
+                            <input id="signin-pass" name="password" type="password" class="input" required>
+                        </div>
+                        <!-- Error message for Sign In -->
+                        <% if (locals.signInError) { %>
+                            <div class="error-message"><%= signInError %></div>
+                        <% } %>
+                        <div class="group">
+                            <input type="submit" class="button" value="Sign In">
+                        </div>
+                        <div class="hr"></div>
+                        <div class="foot-lnk">
+                            <a href="#forgot">Forgot Password?</a>
+                        </div>
+                    </form>
                 </div>
+
+                <!-- Sign Up Form -->
                 <div class="sign-up-htm">
-                    <div class="group">
-                        <label for="user" class="label">Username</label>
-                        <input id="user" type="text" class="input">
-                    </div>
-                    <div class="group">
-                        <label for="pass" class="label">Password</label>
-                        <input id="pass" type="password" class="input" data-type="password">
-                    </div>
-                    <div class="group">
-                        <label for="pass" class="label">Repeat Password</label>
-                        <input id="pass" type="password" class="input" data-type="password">
-                    </div>
-                    <div class="group">
-                        <label for="pass" class="label">Email Address</label>
-                        <input id="pass" type="text" class="input">
-                    </div>
-                    <div class="group">
-                        <input type="submit" class="button" value="Sign Up">
-                    </div>
-                    <div class="hr"></div>
-                    <div class="foot-lnk">
-                        <label for="tab-1">Already Member?</a>
-                    </div>
+                    <form action="/signup" method="POST">
+                        <div class="group">
+                            <label for="signup-user" class="label">Username</label>
+                            <input id="signup-user" name="username" type="text" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="signup-pass" class="label">Password</label>
+                            <input id="signup-pass" name="password" type="password" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="signup-repeat-pass" class="label">Repeat Password</label>
+                            <input id="signup-repeat-pass" name="repeat_password" type="password" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="signup-email" class="label">Email Address</label>
+                            <input id="signup-email" name="email" type="email" class="input" required>
+                        </div>
+                        <!-- Error message for Sign Up -->
+                        <% if (locals.signUpError) { %>
+                            <div class="error-message"><%= signUpError %></div>
+                        <% } %>
+                        <div class="group">
+                            <input type="submit" class="button" value="Sign Up">
+                        </div>
+                        <div class="hr"></div>
+                        <div class="foot-lnk">
+                            <label for="tab-1">Already Member?</label>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

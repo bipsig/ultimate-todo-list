@@ -9,9 +9,15 @@
 <body>
     <div class="todo-wrap">
         <div class="todo-html">
+            <div class="welcome-header">
+                <h2>Welcome, <%= userName %>!</h2>
+            </div>
+
             <div class="todo-header">
                 <h1>My Todo List</h1>
-                <button id="logout" class="logout-button">Logout</button>
+                <form id="logout-form" action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" id="logout" class="logout-button">Logout</button>
+                </form>
             </div>
             <div class="todo-form">
                 <div class="group">
@@ -23,9 +29,9 @@
                 <% if (tasks.length) { %>
                     <% tasks.forEach(task => { %>
                         <div class="task-item">
-                            <input type="checkbox" id="task-<%= task.id %>" <%= task.completed ? 'checked' : '' %>>
-                            <label for="task-<%= task.id %>"><%= task.title %></label>
-                            <button class="delete-task" data-id="<%= task.id %>">✖</button>
+                            <input type="checkbox" id="task-<%= task.item_id %>" <%= task.completed ? 'checked' : '' %>>
+                            <label for="task-<%= task.item_id %>"><%= task.name %></label>
+                            <button class="delete-task" data-id="<%= task.item_id %>">✖</button>
                         </div>
                     <% }) %>
                 <% } else { %>
@@ -34,6 +40,5 @@
             </div>
         </div>
     </div>
-    <script src="/scripts/todo.js"></script>
 </body>
 </html>

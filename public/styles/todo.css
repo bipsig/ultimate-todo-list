@@ -32,6 +32,36 @@ body {
     position: relative;
 }
 
+.welcome-header {
+    background: #f5f5f5; /* Light background for a clean look */
+    padding: 20px 30px; /* Adequate padding for visual appeal */
+    border-radius: 8px; /* Slightly rounded corners */
+    margin-bottom: 20px;
+    color: #333; /* Dark text for contrast */
+    text-align: center;
+    border: 1px solid #ddd; /* Subtle border for definition */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.welcome-header h2 {
+    margin: 0;
+    font-size: 24px; /* Medium font size for readability */
+    font-weight: 600; /* Semi-bold for a clean look */
+    color: #333; /* Dark text color for readability */
+    letter-spacing: 0.5px; /* Slight letter spacing for elegance */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .welcome-header {
+        padding: 15px 20px; /* Adjust padding for smaller screens */
+    }
+
+    .welcome-header h2 {
+        font-size: 20px; /* Smaller font size for smaller screens */
+    }
+}
+
 .todo-header {
     display: flex;
     justify-content: space-between;
@@ -133,4 +163,42 @@ body {
 
 .task-item .delete-task:hover {
     color: #ff0000;
+}
+
+
+
+.no-tasks-html {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+.no-tasks-message {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.no-tasks-message p {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.no-tasks-message .button {
+    background: #1161ee;
+    color: #fff;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 25px;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.no-tasks-message .button:hover {
+    background: #1454c4;
 }
