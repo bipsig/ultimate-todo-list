@@ -237,6 +237,26 @@ app.post ('/delete-task', async (req, res) => {
     res.redirect ('/home');
 })
 
+app.post ('/toggle-task', async (req, res) => {
+    // console.log (req.body);
+
+    const isCompleted  = req.body.isCompleted === "true" ? false : true;
+    const itemId = req.body.itemId;
+
+    // console.log (isCompleted);
+
+    const response = await Item.updateOne (
+        {_id: itemId},
+        {$set: {
+            completed: isCompleted
+        }}
+    );
+
+    console.log (response);
+
+    res.redirect ('/home');
+})
+
 app.get ('*', (req, res) => {
     res.render ("error.ejs");
 });

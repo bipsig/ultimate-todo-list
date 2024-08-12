@@ -132,6 +132,7 @@ body {
 .task-item {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Align items to the ends */
     padding: 15px;
     margin-bottom: 10px;
     background: rgba(255, 255, 255, 0.1);
@@ -143,6 +144,15 @@ body {
 .task-item input[type="checkbox"] {
     margin-right: 15px;
     cursor: pointer;
+    accent-color: #1161ee;
+}
+
+.task-item .check-form input[type="checkbox"]:checked + label {
+    text-decoration: line-through;
+    color: #bbb; 
+}
+
+.task-item .check-form input[type="checkbox"]:checked {
     accent-color: #1161ee;
 }
 

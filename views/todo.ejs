@@ -30,14 +30,18 @@
             <div class="todo-list">
                 <% if (tasks.length) { %>
                     <% tasks.forEach(task => { %>
-                        <form action = "/delete-task" method="POST">
                             <div class="task-item">
-                                <input type="checkbox" id="task-<%= task._id %>" <%= task.completed ? 'checked' : '' %>>
-                                <label for="task-<%= task._id %>"><%= task.item_name %></label>
-                                <input type="hidden" name="itemId" value="<%= task._id %>">
-                                <button class="delete-task" data-id="<%= task._id %>" type="submit">✖</button>
+                                <form class="check-form" action = "/toggle-task" method="POST">
+                                    <input type="hidden" name="isCompleted" value="<%= task.completed %>">
+                                    <input type="hidden" name="itemId" value="<%= task._id %>">
+                                    <input type="checkbox" id="task-<%= task._id %>" <%= task.completed ? 'checked' : '' %> onChange="this.form.submit()">
+                                    <label for="task-<%= task._id %>"><%= task.item_name %></label>
+                                </form>
+                                <form action = "/delete-task" method="POST">
+                                    <input type="hidden" name="itemId" value="<%= task._id %>">
+                                    <button class="delete-task" data-id="<%= task._id %>" type="submit">✖</button>
+                                </form>
                             </div>
-                        </form>
                     <% }) %>
                 <% } else { %>
                     <p>No tasks added yet!</p>
