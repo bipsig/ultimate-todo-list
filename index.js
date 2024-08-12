@@ -50,6 +50,37 @@ await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
 
 let currentUser = "";
 
+//User Defined Functions
+const addItemToList = async (newItem) => {
+    const response = await newItem.save();
+    // console.log (response);
+
+    const newItemId = response._id;
+    // console.log (newItemId);
+
+    await User.updateOne (
+        {_id: currentUser},
+        {$push: {
+            items: newItemId
+        }}
+    );
+}
+
+const deleteItemFromList = async (itemId) => {
+    const response = await User.updateOne (
+        {_id: currentUser},
+        {$pull: {
+            items: itemId
+        }}
+    );
+
+    // console.log (response);
+
+    await Item.deleteOne (
+        {_id: itemId}
+    );
+}
+
 app.get ('/', (req, res) => {
     const signInError = req.flash('signInError')[0] || "";
     const signUpError = req.flash('signUpError')[0] || "";
@@ -75,7 +106,7 @@ app.get ('/home', async (req, res) => {
     }
 
     const user = await User.find ({_id: currentUser});
-    console.log ("Inside Home, user = ", user);
+    // console.log ("Inside Home, user = ", user);
 
     const userItemsIds = user[0].items;
     let userItems = [];
@@ -86,7 +117,7 @@ app.get ('/home', async (req, res) => {
         userItems.push (tmp [0]);
     }
 
-    console.log (userItems);
+    // console.log (userItems);
 
     res.render ("todo.ejs", {
         userName: user[0].username,
@@ -178,6 +209,33 @@ app.post ('/logout', (req, res) => {
     currentUser = "";
     res.redirect ('/');
 });
+
+
+app.post ('/add-task', async (req, res) => {
+    // console.log (req.body);
+
+    const userTask = req.body.task;
+
+    const newItem = new Item ({
+        item_name: userTask,
+        completed: false
+    });
+
+    await addItemToList (newItem);
+
+    res.redirect ('/home');
+});
+
+app.post ('/delete-task', async (req, res) => {
+    // console.log (req.body);
+
+    const itemId = req.body.itemId;
+    // console.log (itemId);
+
+    await deleteItemFromList (itemId);
+
+    res.redirect ('/home');
+})
 
 app.get ('*', (req, res) => {
     res.render ("error.ejs");

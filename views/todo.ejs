@@ -20,19 +20,24 @@
                 </form>
             </div>
             <div class="todo-form">
-                <div class="group">
-                    <input id="new-task" type="text" class="input" placeholder="Add a new task...">
-                    <button id="add-task" class="button">Add Task</button>
-                </div>
+                <form action="/add-task" method="POST">
+                    <div class="group">
+                        <input id="new-task" name="task" type="text" class="input" placeholder="Add a new task..." required>
+                        <button id="add-task" class="button" type="submit">Add Task</button>
+                    </div>
+                </form>                
             </div>
             <div class="todo-list">
                 <% if (tasks.length) { %>
                     <% tasks.forEach(task => { %>
-                        <div class="task-item">
-                            <input type="checkbox" id="task-<%= task._id %>" <%= task.completed ? 'checked' : '' %>>
-                            <label for="task-<%= task._id %>"><%= task.item_name %></label>
-                            <button class="delete-task" data-id="<%= task._id %>">✖</button>
-                        </div>
+                        <form action = "/delete-task" method="POST">
+                            <div class="task-item">
+                                <input type="checkbox" id="task-<%= task._id %>" <%= task.completed ? 'checked' : '' %>>
+                                <label for="task-<%= task._id %>"><%= task.item_name %></label>
+                                <input type="hidden" name="itemId" value="<%= task._id %>">
+                                <button class="delete-task" data-id="<%= task._id %>" type="submit">✖</button>
+                            </div>
+                        </form>
                     <% }) %>
                 <% } else { %>
                     <p>No tasks added yet!</p>
