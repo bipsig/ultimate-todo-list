@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import flash from 'connect-flash';
 import mongoose from "mongoose";
+import _ from "lodash";
 import { mongoItems, mongoLists, mongoUsers } from "./mongoData.js";
 import Item from "./models/items.js";
 import List from "./models/lists.js";
@@ -47,7 +48,7 @@ await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
 // const response = await User.insertMany (mongoUsers);
 // console.log ("MongoUsers injected successfully", response);
 
-let currentUser = -1;
+let currentUser = "";
 
 app.get ('/', (req, res) => {
     const signInError = req.flash('signInError')[0] || "";
@@ -62,50 +63,53 @@ app.get ('/', (req, res) => {
 });
 
 
-app.get ('/home', (req, res) => {
+app.get ('/home', async (req, res) => {
     // console.log (data.users);
     // console.log (data.lists);
     // console.log (data.items);
 
-    if (currentUser === -1) {
+    if (currentUser === "") {
         return res.render ("error.ejs");
     }
 
-    const user = data.users.find ((user) => user.user_id === currentUser);
-    console.log ("inside Home", user);
+    const user = await User.find ({_id: currentUser});
+    console.log ("Inside Home, user = ", user);
 
-    const userItemsId = user.items;
+    const userItemsIds = user[0].items;
     let userItems = [];
 
-    for (let i = 0; i < userItemsId.length; i++) {
-        let tmp = data.items.find ((item) => item.item_id === userItemsId [i]);
-        // console.log (tmp);
-        userItems.push (tmp);
+    for (let i = 0; i < userItemsIds.length; i++) {
+        let tmp = await Item.find ({_id: userItemsIds [i]});
+        // console.log (tmp [0]);
+        userItems.push (tmp [0]);
     }
 
     console.log (userItems);
 
     res.render ("todo.ejs", {
-        userName: user.username,
+        userName: user[0].username,
         tasks: userItems
     })
 });
 
-app.post ('/signin', (req, res) => {
+app.post ('/signin', async (req, res) => {
     // console.log (req.body);
 
-    const inputUsername = req.body.username;
+    const inputUsername = _.capitalize (req.body.username);
     const inputPassword = req.body.password;
 
-    const user = data.users.find ((user) => user.username === inputUsername);
+    console.log (inputUsername, inputPassword);
+
+    // const user = data.users.find ((user) => user.username === inputUsername);
+    const user = await User.find ({ username: inputUsername });
     // console.log (user);
 
-    if (user) {
+    if (user.length !== 0) {
         // console.log ("User Found");
 
-        if (inputPassword === user.password) {
+        if (inputPassword === user[0].password) {
             // console.log ("Correct Password");
-            currentUser = user.user_id;
+            currentUser = user [0]._id;
             res.redirect ('/home');
         }
         else {
@@ -129,7 +133,7 @@ app.post ('/signin', (req, res) => {
 });
 
 app.post ('/logout', (req, res) => {
-    currentUser = -1;
+    currentUser = "";
     res.redirect ('/');
 });
 

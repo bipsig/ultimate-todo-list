@@ -29,9 +29,9 @@
                 <% if (tasks.length) { %>
                     <% tasks.forEach(task => { %>
                         <div class="task-item">
-                            <input type="checkbox" id="task-<%= task.item_id %>" <%= task.completed ? 'checked' : '' %>>
-                            <label for="task-<%= task.item_id %>"><%= task.name %></label>
-                            <button class="delete-task" data-id="<%= task.item_id %>">✖</button>
+                            <input type="checkbox" id="task-<%= task._id %>" <%= task.completed ? 'checked' : '' %>>
+                            <label for="task-<%= task._id %>"><%= task.item_name %></label>
+                            <button class="delete-task" data-id="<%= task._id %>">✖</button>
                         </div>
                     <% }) %>
                 <% } else { %>
