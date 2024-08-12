@@ -7,9 +7,10 @@
 <body>
     <div class="login-wrap">
         <div class="login-html">
-            <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+            <!-- Set the default tab based on the presence of a sign-up error -->
+            <input id="tab-1" type="radio" name="tab" class="sign-in" <%= locals.signUpError ? '' : 'checked' %> >
             <label for="tab-1" class="tab">Sign In</label>
-            <input id="tab-2" type="radio" name="tab" class="sign-up">
+            <input id="tab-2" type="radio" name="tab" class="sign-up" <%= locals.signUpError ? 'checked' : '' %> >
             <label for="tab-2" class="tab">Sign Up</label>
             <div class="login-form">
                 <!-- Sign In Form -->
@@ -26,6 +27,9 @@
                         <!-- Error message for Sign In -->
                         <% if (locals.signInError) { %>
                             <div class="error-message"><%= signInError %></div>
+                        <% } %>
+                        <% if (locals.signUpSuccess) { %>
+                            <div class="success-message"><%= signUpSuccess %></div>
                         <% } %>
                         <div class="group">
                             <input type="submit" class="button" value="Sign In">

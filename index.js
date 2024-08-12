@@ -53,12 +53,14 @@ let currentUser = "";
 app.get ('/', (req, res) => {
     const signInError = req.flash('signInError')[0] || "";
     const signUpError = req.flash('signUpError')[0] || "";
+    const signUpSuccess = req.flash('signUpSuccess')[0] || "";
     
     // console.log (signInError);
 
     res.render ("index.ejs", {
         signInError: signInError,
-        signUpError: signUpError
+        signUpError: signUpError,
+        signUpSuccess: signUpSuccess
     });
 });
 
@@ -98,7 +100,7 @@ app.post ('/signin', async (req, res) => {
     const inputUsername = _.capitalize (req.body.username);
     const inputPassword = req.body.password;
 
-    console.log (inputUsername, inputPassword);
+    // console.log (inputUsername, inputPassword);
 
     // const user = data.users.find ((user) => user.username === inputUsername);
     const user = await User.find ({ username: inputUsername });
@@ -131,6 +133,46 @@ app.post ('/signin', async (req, res) => {
         //Return statement ensures that no code beyond the res.redirect is executed which handles the problem of redundant redirects which you were facing in earlier projects
     }
 });
+
+app.post ('/signup', async (req, res) => {
+    console.log (req.body);
+
+    if (req.body.password !== req.body.repeat_password) {
+        req.flash ('signUpError', "Password do not match! Try again.");
+        return res.redirect ('/');
+    }
+
+    const inputUsername = _.capitalize (req.body.username);
+    const inputPassword = req.body.password;
+    const inputEmail = req.body.email;
+
+    // console.log (inputUsername, inputPassword, inputEmail);
+
+    let existingUser = await User.find ({username: inputUsername});
+    if (existingUser.length !== 0) {
+        req.flash ('signUpError', "Username already exists! Try again.");
+        return res.redirect ('/');
+    }
+
+    existingUser = await User.find ({email: inputEmail });
+    if (existingUser.length !== 0) {
+        req.flash ('signUpError', "Email already exists! Try again.");
+        return res.redirect ('/');
+    }
+
+    const newUser = new User ({
+        username: inputUsername,
+        password: inputPassword,
+        email: inputEmail,
+        lists: [],
+        items: []
+    });
+
+    await newUser.save();
+
+    req.flash ('signUpSuccess', "User Created Successfully! Sign In to continue");
+    return res.redirect ('/');
+})
 
 app.post ('/logout', (req, res) => {
     currentUser = "";
