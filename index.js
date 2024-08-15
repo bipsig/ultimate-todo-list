@@ -49,6 +49,7 @@ await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
 // console.log ("MongoUsers injected successfully", response);
 
 let currentUser = "";
+let currentUsername = "";
 
 //User Defined Functions
 const addItemToList = async (newItem) => {
@@ -79,7 +80,25 @@ const deleteItemFromList = async (itemId) => {
     await Item.deleteOne (
         {_id: itemId}
     );
-}
+};
+
+const findList = async (listName) => {
+    const response = await User.find({_id: currentUser});
+    // console.log (response);
+    const availableLists = response[0].lists;
+    // console.log (availableLists);
+
+    for (let i = 0; i < availableLists.length; i++) {
+        const returnedList = await List.findById (availableLists [i]);
+        // console.log (returnedList);
+
+        if (returnedList.list_name === listName) {
+            return returnedList;
+        }
+    }
+
+    return null;
+};
 
 app.get ('/', (req, res) => {
     const signInError = req.flash('signInError')[0] || "";
@@ -120,6 +139,7 @@ app.get ('/home', async (req, res) => {
     // console.log (userItems);
 
     res.render ("todo.ejs", {
+        listName: "General List",
         userName: user[0].username,
         tasks: userItems
     })
@@ -143,6 +163,7 @@ app.post ('/signin', async (req, res) => {
         if (inputPassword === user[0].password) {
             // console.log ("Correct Password");
             currentUser = user [0]._id;
+            currentUsername = inputUsername;
             res.redirect ('/home');
         }
         else {
@@ -207,6 +228,7 @@ app.post ('/signup', async (req, res) => {
 
 app.post ('/logout', (req, res) => {
     currentUser = "";
+    currentUsername = "";
     res.redirect ('/');
 });
 
@@ -252,10 +274,67 @@ app.post ('/toggle-task', async (req, res) => {
         }}
     );
 
-    console.log (response);
+    // console.log (response);
 
     res.redirect ('/home');
+});
+
+app.get ("/home/:path", async (req, res) => {
+    // console.log ("Current User: ", currentUser);
+    // console.log ("Path: ", req.params.path);
+
+    if (currentUser === "") {
+        return res.render ("error.ejs");
+    }
+
+    const listName = _.capitalize (req.params.path);
+
+    const listExists = await findList (listName);
+
+    if (listExists) {
+        // console.log ("List Exists: ", listExists);
+
+        const listItemIds = listExists.items;
+        let itemList = [];
+
+        for (let i = 0; i < listItemIds.length; i++) {
+            const res = await Item.findById (listItemIds [i]);
+
+            itemList.push (res);
+        }
+
+        // console.log (itemList);
+        return res.render ("todo.ejs", {
+            listName: listName,
+            userName: currentUsername,
+            tasks: itemList
+        });
+    }
+    else {
+        console.log ("No such list exists", listName);
+        
+        const newList = new List ({
+            list_name: listName,
+            items: []
+        });
+
+        const response = await newList.save();
+        console.log (response._id); 
+
+        await User.updateOne (
+            {_id: currentUser},
+            {$push: {
+                lists: response._id
+            }}
+        );
+
+        console.log ("done");
+
+        return res.redirect (`/home/${listName}`);
+    }
 })
+
+
 
 app.get ('*', (req, res) => {
     res.render ("error.ejs");
