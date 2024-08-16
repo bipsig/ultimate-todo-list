@@ -48,12 +48,19 @@ await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
 // const response = await User.insertMany (mongoUsers);
 // console.log ("MongoUsers injected successfully", response);
 
+
+//Global variables to maintain the current user and the list being utilized. Basically helps in reducing the number of Mongo Queries
 let currentUser = "";
 let currentUsername = "";
 let currentListId = "";
 let currentListName = "";
 
 //User Defined Functions
+/*
+    1. To add item to a list. Based on currentListId it is decided whether to add to a particular list or default list of user
+    2. To delete item from a list with similar functionalities of the above
+    3. To find list of a user. If such a list already exists return that list or return null value so that we can create a new list as required.
+*/
 const addItemToList = async (newItem) => {
     const response = await newItem.save();
     // console.log (response);
@@ -80,7 +87,6 @@ const addItemToList = async (newItem) => {
 }
 
 const deleteItemFromList = async (itemId) => {
-
     if (currentListId === "") {
         await User.updateOne (
             {_id: currentUser},
@@ -122,6 +128,7 @@ const findList = async (listName) => {
     return null;
 };
 
+// Default page
 app.get ('/', (req, res) => {
     const signInError = req.flash('signInError')[0] || "";
     const signUpError = req.flash('signUpError')[0] || "";
@@ -136,7 +143,7 @@ app.get ('/', (req, res) => {
     });
 });
 
-
+//We check whether a user is logged in or not. If not we display a page that no user logged in,
 app.get ('/home', async (req, res) => {
     // console.log (data.users);
     // console.log (data.lists);
@@ -174,7 +181,7 @@ app.get ("/home/:path", async (req, res) => {
     // console.log ("Path: ", req.params.path);
 
     if (currentUser === "") {
-        return res.render ("error.ejs");
+        return res.redirect ('/home');
     }
 
     const listName = _.capitalize (req.params.path);
@@ -381,7 +388,7 @@ app.post ('/logout', (req, res) => {
 
 
 app.get ('*', (req, res) => {
-    res.render ("error.ejs");
+    res.render ("404.ejs");
 });
 
 app.listen (port, () => {
