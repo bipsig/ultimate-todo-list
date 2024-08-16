@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    dob: {
+        type: Date,
+        required: true
+    },
     lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }],
     items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }]
 });

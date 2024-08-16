@@ -349,6 +349,7 @@ app.post ('/signup', async (req, res) => {
     const inputUsername = _.capitalize (req.body.username);
     const inputPassword = req.body.password;
     const inputEmail = req.body.email;
+    const inputDob = req.body.dob;
 
     // console.log (inputUsername, inputPassword, inputEmail);
 
@@ -368,6 +369,7 @@ app.post ('/signup', async (req, res) => {
         username: inputUsername,
         password: inputPassword,
         email: inputEmail,
+        dob: inputDob,
         lists: [],
         items: []
     });
@@ -385,6 +387,55 @@ app.post ('/logout', (req, res) => {
     currentListName = "";
     res.redirect ('/');
 });
+
+app.get ('/forgot', (req, res) => {
+
+    const message = req.flash('isDetailsMatching')[0] || "";
+    const password = req.flash('password')[0] || "";
+    // console.log (message);
+    // console.log ("password", password);
+
+    // console.log (req.flash ('isDetailsMatching'));
+    if (message === 'Match') {
+        return res.render ("forgot-password.ejs", {
+            forgotPasswordSuccess: `Correct details. Your password is: ${password}`
+        });
+    }
+    else if (message === "") {
+        return res.render ("forgot-password.ejs");
+    }
+    else {
+        return res.render ("forgot-password.ejs", {
+            forgotPasswordError: "Wrong Details Provided. Try Again!"
+        });
+    }
+});
+
+app.post ('/forgot-password', async (req, res) => {
+    const inputUsername = _.capitalize(req.body.username);
+    const inputEmail = req.body.email;
+    const inputDob = req.body.dob;
+
+    // console.log (inputUsername, inputEmail, inputDob);
+
+    const response = await User.find (
+        {username: inputUsername}
+    );
+
+    // console.log (response);
+
+    if (response.length !== 0 && inputEmail === response [0].email && new Date (inputDob).getTime() === new Date (response [0].dob).getTime()) {
+        // console.log ("details Matched");
+        req.flash ('isDetailsMatching', "Match");
+        req.flash ('password', response[0].password);
+    }
+    else {
+        // console.log ("Not matching");
+        req.flash ('isDetailsMatching', "No Match")
+    }
+
+    res.redirect ('/forgot');
+})
 
 
 app.get ('*', (req, res) => {

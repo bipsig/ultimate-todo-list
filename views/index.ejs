@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="stylesheet" href="styles/styles.css" />
     <title>TODO List</title>
 </head>
+
 <body>
     <div class="login-wrap">
         <div class="login-html">
             <!-- Set the default tab based on the presence of a sign-up error -->
-            <input id="tab-1" type="radio" name="tab" class="sign-in" <%= locals.signUpError ? '' : 'checked' %> >
+            <input id="tab-1" type="radio" name="tab" class="sign-in" <%=locals.signUpError ? '' : 'checked' %> >
             <label for="tab-1" class="tab">Sign In</label>
-            <input id="tab-2" type="radio" name="tab" class="sign-up" <%= locals.signUpError ? 'checked' : '' %> >
+            <input id="tab-2" type="radio" name="tab" class="sign-up" <%=locals.signUpError ? 'checked' : '' %> >
             <label for="tab-2" class="tab">Sign Up</label>
             <div class="login-form">
                 <!-- Sign In Form -->
@@ -26,17 +28,21 @@
                         </div>
                         <!-- Error message for Sign In -->
                         <% if (locals.signInError) { %>
-                            <div class="error-message"><%= signInError %></div>
+                            <div class="error-message">
+                                <%= signInError %>
+                            </div>
                         <% } %>
                         <% if (locals.signUpSuccess) { %>
-                            <div class="success-message"><%= signUpSuccess %></div>
+                            <div class="success-message">
+                                <%= signUpSuccess %>
+                            </div>
                         <% } %>
                         <div class="group">
                             <input type="submit" class="button" value="Sign In">
                         </div>
                         <div class="hr"></div>
                         <div class="foot-lnk">
-                            <a href="#forgot">Forgot Password?</a>
+                            <a href="/forgot">Forgot Password?</a>
                         </div>
                     </form>
                 </div>
@@ -54,27 +60,35 @@
                         </div>
                         <div class="group">
                             <label for="signup-repeat-pass" class="label">Repeat Password</label>
-                            <input id="signup-repeat-pass" name="repeat_password" type="password" class="input" required>
+                            <input id="signup-repeat-pass" name="repeat_password" type="password" class="input"
+                                required>
                         </div>
                         <div class="group">
                             <label for="signup-email" class="label">Email Address</label>
                             <input id="signup-email" name="email" type="email" class="input" required>
                         </div>
+                        <div class="group">
+                            <label for="signup-dob" class="label">Date of Birth</label>
+                            <input id="signup-dob" name="dob" type="date" class="input" required>
+                        </div>
                         <!-- Error message for Sign Up -->
                         <% if (locals.signUpError) { %>
-                            <div class="error-message"><%= signUpError %></div>
-                        <% } %>
-                        <div class="group">
-                            <input type="submit" class="button" value="Sign Up">
-                        </div>
-                        <div class="hr"></div>
-                        <div class="foot-lnk">
-                            <label for="tab-1">Already Member?</label>
-                        </div>
+                            <div class="error-message">
+                                <%= signUpError %>
+                            </div>
+                            <% } %>
+                                <div class="group">
+                                    <input type="submit" class="button" value="Sign Up">
+                                </div>
+                                <div class="hr"></div>
+                                <div class="foot-lnk">
+                                    <label for="tab-1">Already Member?</label>
+                                </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
