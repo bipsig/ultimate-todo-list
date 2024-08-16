@@ -50,6 +50,8 @@ await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
 
 let currentUser = "";
 let currentUsername = "";
+let currentListId = "";
+let currentListName = "";
 
 //User Defined Functions
 const addItemToList = async (newItem) => {
@@ -59,24 +61,44 @@ const addItemToList = async (newItem) => {
     const newItemId = response._id;
     // console.log (newItemId);
 
-    await User.updateOne (
-        {_id: currentUser},
-        {$push: {
-            items: newItemId
-        }}
-    );
+    if (currentListId === "") {
+        await User.updateOne (
+            {_id: currentUser},
+            {$push: {
+                items: newItemId
+            }}
+        );
+    }
+    else {
+        await List.updateOne (
+            {_id: currentListId},
+            {$push: {
+                items: newItemId
+            }}
+        );
+    }
 }
 
 const deleteItemFromList = async (itemId) => {
-    const response = await User.updateOne (
-        {_id: currentUser},
-        {$pull: {
-            items: itemId
-        }}
-    );
+
+    if (currentListId === "") {
+        await User.updateOne (
+            {_id: currentUser},
+            {$pull: {
+                items: itemId
+            }}
+        );
+    }
+    else {
+        await List.updateOne (
+            {_id: currentListId},
+            {$pull: {
+                items: itemId
+            }}
+        );
+    }
 
     // console.log (response);
-
     await Item.deleteOne (
         {_id: itemId}
     );
@@ -125,6 +147,8 @@ app.get ('/home', async (req, res) => {
     }
 
     const user = await User.find ({_id: currentUser});
+    currentListId = "";
+    currentListName = "";
     // console.log ("Inside Home, user = ", user);
 
     const userItemsIds = user[0].items;
@@ -145,6 +169,127 @@ app.get ('/home', async (req, res) => {
     })
 });
 
+app.get ("/home/:path", async (req, res) => {
+    // console.log ("Current User: ", currentUser);
+    // console.log ("Path: ", req.params.path);
+
+    if (currentUser === "") {
+        return res.render ("error.ejs");
+    }
+
+    const listName = _.capitalize (req.params.path);
+
+    const listExists = await findList (listName);
+
+    if (listExists) {
+        // console.log ("List Exists: ", listExists);
+
+        const listItemIds = listExists.items;
+        let itemList = [];
+
+        for (let i = 0; i < listItemIds.length; i++) {
+            const res = await Item.findById (listItemIds [i]);
+
+            itemList.push (res);
+        }
+
+        // console.log (itemList);
+        currentListId = listExists._id;
+        currentListName = listName;
+        return res.render ("todo.ejs", {
+            listName: listName,
+            userName: currentUsername,
+            tasks: itemList
+        });
+    }
+    else {
+        // console.log ("No such list exists", listName);
+        
+        const newList = new List ({
+            list_name: listName,
+            items: []
+        });
+
+        const response = await newList.save();
+        // console.log (response._id); 
+
+        await User.updateOne (
+            {_id: currentUser},
+            {$push: {
+                lists: response._id
+            }}
+        );
+
+        // console.log ("done");
+
+        return res.redirect (`/home/${listName}`);
+    }
+});
+
+
+//Tasks updation Routes
+app.post ('/add-task', async (req, res) => {
+    // console.log (req.body);
+
+    const userTask = req.body.task;
+
+    const newItem = new Item ({
+        item_name: userTask,
+        completed: false
+    });
+
+    await addItemToList (newItem);
+
+    if (currentListId === "") {
+        res.redirect ('/home');
+    }
+    else {
+        res.redirect (`/home/${currentListName}`)
+    }
+});
+
+app.post ('/delete-task', async (req, res) => {
+    // console.log (req.body);
+
+    const itemId = req.body.itemId;
+    // console.log (itemId);
+
+    await deleteItemFromList (itemId);
+
+    if (currentListId === "") {
+        res.redirect ('/home');
+    }
+    else {
+        res.redirect (`/home/${currentListName}`)
+    }
+})
+
+app.post ('/toggle-task', async (req, res) => {
+    // console.log (req.body);
+
+    const isCompleted  = req.body.isCompleted === "true" ? false : true;
+    const itemId = req.body.itemId;
+
+    // console.log (isCompleted);
+
+    const response = await Item.updateOne (
+        {_id: itemId},
+        {$set: {
+            completed: isCompleted
+        }}
+    );
+
+    // console.log (response);
+
+    if (currentListId === "") {
+        res.redirect ('/home');
+    }
+    else {
+        res.redirect (`/home/${currentListName}`)
+    }
+});
+
+//User login/Registration Routes
 app.post ('/signin', async (req, res) => {
     // console.log (req.body);
 
@@ -229,111 +374,10 @@ app.post ('/signup', async (req, res) => {
 app.post ('/logout', (req, res) => {
     currentUser = "";
     currentUsername = "";
+    currentListId = "";
+    currentListName = "";
     res.redirect ('/');
 });
-
-
-app.post ('/add-task', async (req, res) => {
-    // console.log (req.body);
-
-    const userTask = req.body.task;
-
-    const newItem = new Item ({
-        item_name: userTask,
-        completed: false
-    });
-
-    await addItemToList (newItem);
-
-    res.redirect ('/home');
-});
-
-app.post ('/delete-task', async (req, res) => {
-    // console.log (req.body);
-
-    const itemId = req.body.itemId;
-    // console.log (itemId);
-
-    await deleteItemFromList (itemId);
-
-    res.redirect ('/home');
-})
-
-app.post ('/toggle-task', async (req, res) => {
-    // console.log (req.body);
-
-    const isCompleted  = req.body.isCompleted === "true" ? false : true;
-    const itemId = req.body.itemId;
-
-    // console.log (isCompleted);
-
-    const response = await Item.updateOne (
-        {_id: itemId},
-        {$set: {
-            completed: isCompleted
-        }}
-    );
-
-    // console.log (response);
-
-    res.redirect ('/home');
-});
-
-app.get ("/home/:path", async (req, res) => {
-    // console.log ("Current User: ", currentUser);
-    // console.log ("Path: ", req.params.path);
-
-    if (currentUser === "") {
-        return res.render ("error.ejs");
-    }
-
-    const listName = _.capitalize (req.params.path);
-
-    const listExists = await findList (listName);
-
-    if (listExists) {
-        // console.log ("List Exists: ", listExists);
-
-        const listItemIds = listExists.items;
-        let itemList = [];
-
-        for (let i = 0; i < listItemIds.length; i++) {
-            const res = await Item.findById (listItemIds [i]);
-
-            itemList.push (res);
-        }
-
-        // console.log (itemList);
-        return res.render ("todo.ejs", {
-            listName: listName,
-            userName: currentUsername,
-            tasks: itemList
-        });
-    }
-    else {
-        console.log ("No such list exists", listName);
-        
-        const newList = new List ({
-            list_name: listName,
-            items: []
-        });
-
-        const response = await newList.save();
-        console.log (response._id); 
-
-        await User.updateOne (
-            {_id: currentUser},
-            {$push: {
-                lists: response._id
-            }}
-        );
-
-        console.log ("done");
-
-        return res.redirect (`/home/${listName}`);
-    }
-})
-
 
 
 app.get ('*', (req, res) => {
