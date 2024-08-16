@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB setup
-await mongoose.connect ("mongodb://localhost:27017/ultimateTodoListDB");
+await mongoose.connect ("mongodb+srv://admin-sagnik:sagnik_123@cluster0.prwd6.mongodb.net/ultimateTodoListDB");
 
 
 //Injecting Default Data in the mongo Database
